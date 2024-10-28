@@ -50,6 +50,7 @@ public class ThingEnemyAI: EnemyAI
         AllClientOnSwitchBehaviorState();
         ActivateMonster(false);
         agent.speed = 0;
+        debugEnemyAI = true;
 
     }
 
@@ -128,7 +129,7 @@ public class ThingEnemyAI: EnemyAI
                 var player = GameNetworkManager.Instance.localPlayerController;
                 player.gameplayCamera.transform.eulerAngles = new Vector3(0, player.gameplayCamera.transform.eulerAngles.y, player.gameplayCamera.transform.eulerAngles.z);
             }
-            
+            positionJumpScare = targetPlayer.gameplayCamera.transform.position + targetPlayer.gameplayCamera.transform.forward * 1.4f;
             transform.position = positionJumpScare - Vector3.up * 2.5f;
             transform.LookAt(targetPlayer.gameplayCamera.transform);
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
@@ -161,10 +162,15 @@ public class ThingEnemyAI: EnemyAI
             case 1:
             {
                 TargetClosestPlayer(requireLineOfSight: true);
-                if(!targetPlayer) break;
+                Debug.Log($"TARGET PLAYER {targetPlayer}");
+                if(targetPlayer == null) break;
+                Debug.Log($"TARGETABLE PLAYER {PlayerIsTargetable(targetPlayer)}");
                 if (PlayerIsTargetable(targetPlayer))
                 {
+                    Debug.Log($"TARGET PLAYER AND SWITCH STATE");
+
                     NetworkThing.SetPlayerIdServerRpc(NetworkObjectId, targetPlayer.actualClientId);
+                    _sawPlayerCount++;
                     SwitchToBehaviourState(2);
                 }
                 break;
@@ -217,7 +223,6 @@ public class ThingEnemyAI: EnemyAI
                 creatureSFX.PlayOneShot(seePlayerSound);
                 _lightAnimationTimer = _lightAnimationDuration;
                 _shouldResetLights = true;
-                _sawPlayerCount++;
                 GetLightsClose();
                 break;
             }
@@ -272,12 +277,17 @@ public class ThingEnemyAI: EnemyAI
     private IEnumerator JumpScareAnimation()
     {
         yield return new WaitForSeconds(2f);
-        targetPlayer = null;
+        
         if(playerToKillIsLocal)
         {
             GameNetworkManager.Instance.localPlayerController.KillPlayer(Vector3.zero, causeOfDeath: CauseOfDeath.Crushing, deathAnimation: 0);
             CancelPlayerEffects();
         }
+        
+        targetPlayer = null;
+        playerToKillIsLocal = false;
+        playerToKIll = null;
+        ActivateMonster(true);
         
         if (IsOwner)
         {
@@ -308,16 +318,8 @@ public class ThingEnemyAI: EnemyAI
             
             player.disableMoveInput = false;
             player.disableLookInput = false;
-            player.inAnimationWithEnemy = null;
-            player.isInElevator = false;
             player.disableInteract = false;
-            player.isInHangarShipRoom = false;
         }
-        
-        inSpecialAnimationWithPlayer = null;
-        inSpecialAnimation = false;
-        playerToKillIsLocal = false;
-        targetPlayer = null;
 
     }
 
@@ -387,5 +389,14 @@ public class ThingEnemyAI: EnemyAI
         }
     }
 
-
+    public override void OnCollideWithPlayer(Collider other)
+    {
+        var player = MeetsStandardPlayerCollisionConditions(other);
+        if (player)
+        {
+            targetPlayer = GameNetworkManager.Instance.localPlayerController;
+            playerToKillIsLocal = true;
+            MonsterAttackPlayer();
+        }
+    }
 }
