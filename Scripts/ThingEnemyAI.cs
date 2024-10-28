@@ -41,6 +41,9 @@ public class ThingEnemyAI: EnemyAI
 
     private float _lightAnimationDuration = 3f;
     private float _lightAnimationTimer;
+    private int _lastNodeIndex;
+    private float _timeBetweenTeleport = 1f;
+    private float _teleportTimer;
     
     
     public override void Start()
@@ -60,6 +63,7 @@ public class ThingEnemyAI: EnemyAI
         base.Update(); 
         aiInterval -= Time.deltaTime;
         _lightAnimationTimer -= Time.deltaTime;
+        _teleportTimer -= Time.deltaTime;
         
         if (lastBehaviorState != currentBehaviourStateIndex)
         {
@@ -146,7 +150,7 @@ public class ThingEnemyAI: EnemyAI
         {
             case 0:
             {
-                if (!_isActive)
+                if (!_isActive && _teleportTimer < 0)
                 {
                     var pos = GetRandomNodeObjectPos();
                     if (CheckIfPlayerAreInRange(pos))
@@ -162,7 +166,7 @@ public class ThingEnemyAI: EnemyAI
             case 1:
             {
                 TargetClosestPlayer(requireLineOfSight: true);
-                Debug.Log($"TARGET PLAYER {targetPlayer}");
+                Debug.Log($"TARGET PLAYER {targetPlayer != null}");
                 if(targetPlayer == null) break;
                 Debug.Log($"TARGETABLE PLAYER {PlayerIsTargetable(targetPlayer)}");
                 if (PlayerIsTargetable(targetPlayer))
@@ -171,6 +175,7 @@ public class ThingEnemyAI: EnemyAI
 
                     NetworkThing.SetPlayerIdServerRpc(NetworkObjectId, targetPlayer.actualClientId);
                     _sawPlayerCount++;
+                    _teleportTimer = _timeBetweenTeleport;
                     SwitchToBehaviourState(2);
                 }
                 break;
@@ -287,7 +292,7 @@ public class ThingEnemyAI: EnemyAI
         targetPlayer = null;
         playerToKillIsLocal = false;
         playerToKIll = null;
-        ActivateMonster(true);
+        _teleportTimer = _timeBetweenTeleport;
         
         if (IsOwner)
         {
@@ -300,9 +305,9 @@ public class ThingEnemyAI: EnemyAI
 
     public void MonsterAttackPlayer()
     {
-        if (playerToKillIsLocal && targetPlayer && GameNetworkManager.Instance.localPlayerController.isPlayerDead)
+        if (playerToKillIsLocal && targetPlayer && targetPlayer.isPlayerDead)
         {
-            SwitchToBehaviourServerRpc(0);
+            SwitchToBehaviourState(0);
         }
         _shouldTpToPlayer = true;
         if(IsOwner) SwitchToBehaviourState(4);
@@ -333,7 +338,14 @@ public class ThingEnemyAI: EnemyAI
     {
         if (allAINodes.Length > 0)
         {
-            return allAINodes[Random.Range(0, allAINodes.Length)].transform.position;
+            var index = Random.Range(0, allAINodes.Length);
+            while (index == _lastNodeIndex)
+            {
+                index = Random.Range(0, allAINodes.Length);
+            }
+
+            lastBehaviorState = index;
+            return allAINodes[index].transform.position;
         }
         return transform.position;
     }
@@ -396,6 +408,7 @@ public class ThingEnemyAI: EnemyAI
         {
             targetPlayer = GameNetworkManager.Instance.localPlayerController;
             playerToKillIsLocal = true;
+            NetworkThing.SetPlayerIdServerRpc(NetworkObjectId, targetPlayer.actualClientId);
             MonsterAttackPlayer();
         }
     }

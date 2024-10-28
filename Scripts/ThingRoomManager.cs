@@ -28,7 +28,6 @@ public class ThingRoomManager: MonoBehaviour
     
     public void OnPlayerSpawnIntoRoom()
     {
-        lights.Clear();
         GetAllLights();
         ambientSource.PlayOneShot(welcomeSound);
     }
@@ -54,7 +53,8 @@ public class ThingRoomManager: MonoBehaviour
     private IEnumerator OnScaryAmbientRunned()
     {
         yield return new WaitForSeconds(22f);
-        
+
+        GetAllLights();
         LightsManagement(false, lights);
         if(_playerNightVision?.Light) _playerNightVision.Light.enabled = false;
         
