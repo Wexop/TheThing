@@ -57,10 +57,20 @@ public class ThingEnemyAI: EnemyAI
 
     }
 
+    public override void EnableEnemyMesh(bool enable, bool overrideDoNotSet = false)
+    {
+        return;
+    }
+
+    public override void OnSyncPositionFromServer(Vector3 pos)
+    {
+        transform.position = pos;
+    }
+
     public override void Update()
     {
         
-        base.Update(); 
+        //base.Update(); 
         aiInterval -= Time.deltaTime;
         _lightAnimationTimer -= Time.deltaTime;
         _teleportTimer -= Time.deltaTime;
@@ -210,6 +220,7 @@ public class ThingEnemyAI: EnemyAI
         {
             case 0:
             {
+                targetPlayer = null;
                 ActivateMonster(false);
                 _shouldTpToPlayer = false;
                 break;
@@ -363,7 +374,7 @@ public class ThingEnemyAI: EnemyAI
 
         foreach (var l in lights)
         {
-            l.Light.intensity = l.intensity;
+            if(l.Light) l.Light.intensity = l.intensity;
             if (l.flashlightItem) l.Light.color = l.color;
         }
     }

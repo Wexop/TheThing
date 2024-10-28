@@ -59,8 +59,8 @@ public class ThingRoomManager: MonoBehaviour
         if(_playerNightVision?.Light) _playerNightVision.Light.enabled = false;
         
         yield return new WaitForSeconds(3f);
-        LightsManagement(true, lights);
         if(_playerNightVision?.Light) _playerNightVision.Light.enabled = true;
+        LightsManagement(true, lights);
         ThingEnemyAI.MonsterAttackPlayer();
         lights.Clear();
         StopCoroutine(LightAnimation());
@@ -128,7 +128,7 @@ public class ThingRoomManager: MonoBehaviour
         foreach (var closeObject in closeLights)
         {
             
-            if(closeObject.GetComponentInParent<animatedSun>() != null || closeObject.transform.parent.name == "HelmetLights") continue;
+            if(closeObject.GetComponentInParent<animatedSun>() != null || closeObject.transform.parent.name == "HelmetLights" || closeObject == ThingEnemyAI.redLight) continue;
 
 
             FlashlightItem flashlightItem = closeObject.GetComponentInParent<FlashlightItem>();
