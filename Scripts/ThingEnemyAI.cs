@@ -166,12 +166,9 @@ public class ThingEnemyAI: EnemyAI
             case 1:
             {
                 TargetClosestPlayer(requireLineOfSight: true);
-                Debug.Log($"TARGET PLAYER {targetPlayer != null}");
                 if(targetPlayer == null) break;
-                Debug.Log($"TARGETABLE PLAYER {PlayerIsTargetable(targetPlayer)}");
                 if (PlayerIsTargetable(targetPlayer))
                 {
-                    Debug.Log($"TARGET PLAYER AND SWITCH STATE");
 
                     NetworkThing.SetPlayerIdServerRpc(NetworkObjectId, targetPlayer.actualClientId);
                     _sawPlayerCount++;
@@ -298,7 +295,6 @@ public class ThingEnemyAI: EnemyAI
         {
             var pos = GetRandomNodeObjectPos();
             transform.position = pos;
-            SyncPositionToClients();
             SwitchToBehaviourState(0);
         }
     }
