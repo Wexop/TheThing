@@ -1,0 +1,10 @@
+{
+  "name": "CountryRoadCreature",
+  "version_number": "1.0.7",
+  "website_url": "https://github.com/Wexop/CountryRoadCreature",
+  "description": "[V60] Add a new monster to the game, he's looking at you... Also add 2 scraps items related to him",
+  "dependencies": [
+    "BepInEx-BepInExPack-5.4.2100",
+    "AinaVT-LethalConfig-1.4.2"
+  ]
+}
