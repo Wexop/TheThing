@@ -33,7 +33,7 @@ using LethalLib.Modules;
 
         public ConfigEntry<string> spawnMoonRarity;
         
-        public ConfigEntry<int> maxThingSpawnNb;
+        public ConfigEntry<int> maxSeePlayerCount;
 
         void Awake()
         {
@@ -63,9 +63,9 @@ using LethalLib.Modules;
                 "Chance for thing to spawn for any moon, example => assurance:100,offense:50 . You need to restart the game.");
             CreateStringConfig(spawnMoonRarity, true);
             
-            maxThingSpawnNb = Config.Bind("General", "MaxSpawnNumber", 1,
-                "Max thing spawn number. You need to restart the game.");
-            CreateIntConfig(maxThingSpawnNb);
+            maxSeePlayerCount = Config.Bind("Behavior", "MaxSeePlayerCount", 1,
+                "Max player see by the monster before teleporting him into his room. No need to restart the game !");
+            CreateIntConfig(maxSeePlayerCount);
         }
         
         
@@ -74,8 +74,6 @@ using LethalLib.Modules;
         {
             //creature
             EnemyType creature = bundle.LoadAsset<EnemyType>("Assets/LethalCompany/Mods/ThingMonster/Thing.asset");
-
-            creature.MaxCount = maxThingSpawnNb.Value;
             
             Logger.LogInfo($"{creature.name} FOUND");
             Logger.LogInfo($"{creature.enemyPrefab} prefab");

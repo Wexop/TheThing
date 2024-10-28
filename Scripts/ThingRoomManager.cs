@@ -18,6 +18,8 @@ public class ThingRoomManager: MonoBehaviour
     public List<LightInformation> lights = new List<LightInformation>();
 
     public ThingEnemyAI ThingEnemyAI;
+    
+    private LightInformation _playerNightVision;
 
     private float _lightAnimationsTimer;
     //private float _scaryAmbientAnimationTimer = 20f;
@@ -54,9 +56,11 @@ public class ThingRoomManager: MonoBehaviour
         yield return new WaitForSeconds(22f);
         
         LightsManagement(false, lights);
+        if(_playerNightVision?.Light) _playerNightVision.Light.enabled = false;
         
         yield return new WaitForSeconds(3f);
         LightsManagement(true, lights);
+        if(_playerNightVision?.Light) _playerNightVision.Light.enabled = true;
         ThingEnemyAI.MonsterAttackPlayer();
         StopCoroutine(LightAnimation());
         
@@ -123,7 +127,8 @@ public class ThingRoomManager: MonoBehaviour
         foreach (var closeObject in closeLights)
         {
             
-            if(closeObject.GetComponentInParent<animatedSun>() != null || closeObject.transform.parent.name == "HelmetLights" || closeObject.name == "NightVision") continue;
+            if(closeObject.GetComponentInParent<animatedSun>() != null || closeObject.transform.parent.name == "HelmetLights") continue;
+
 
             FlashlightItem flashlightItem = closeObject.GetComponentInParent<FlashlightItem>();
             
@@ -132,6 +137,13 @@ public class ThingRoomManager: MonoBehaviour
             lightInformation.color = closeObject.color;
             lightInformation.intensity = closeObject.intensity;
             lightInformation.flashlightItem = flashlightItem;
+            
+            if (closeObject.name == "NightVision")
+            {
+                _playerNightVision = lightInformation;
+                continue;
+            }
+            
             lights.Add(lightInformation);
         }
     }

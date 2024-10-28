@@ -50,7 +50,6 @@ public class ThingEnemyAI: EnemyAI
         AllClientOnSwitchBehaviorState();
         ActivateMonster(false);
         agent.speed = 0;
-        debugEnemyAI = true;
 
     }
 
@@ -73,7 +72,7 @@ public class ThingEnemyAI: EnemyAI
             GameNetworkManager.Instance.localPlayerController.JumpToFearLevel(0.8f);
         }
         
-        if (_lightAnimationTimer < 0 && _shouldResetLights)
+        if (_lightAnimationTimer < -0.5f && _shouldResetLights)
         {
             ResetLights();
             _shouldResetLights = false;
@@ -94,7 +93,7 @@ public class ThingEnemyAI: EnemyAI
         if (currentBehaviourStateIndex == 2)
         {
 
-            if (_lightAnimationTimer > 0)
+            if (_lightAnimationTimer > -0.5f)
             {
                 lights.ForEach(l =>
                 {
@@ -123,6 +122,13 @@ public class ThingEnemyAI: EnemyAI
 
         if (currentBehaviourStateIndex == 4 && targetPlayer)
         {
+
+            if (playerToKillIsLocal)
+            {
+                var player = GameNetworkManager.Instance.localPlayerController;
+                player.gameplayCamera.transform.eulerAngles = new Vector3(0, player.gameplayCamera.transform.eulerAngles.y, player.gameplayCamera.transform.eulerAngles.z);
+            }
+            
             transform.position = positionJumpScare - Vector3.up * 2.5f;
             transform.LookAt(targetPlayer.gameplayCamera.transform);
             transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
@@ -165,7 +171,7 @@ public class ThingEnemyAI: EnemyAI
             }
             case 2:
             {
-                if (_lightAnimationTimer < 0)
+                if (_lightAnimationTimer <= 0.5f)
                 {
                      SwitchToBehaviourState(_sawPlayerCount == 3 ? 3: 0);
                 }
@@ -211,7 +217,7 @@ public class ThingEnemyAI: EnemyAI
                 creatureSFX.PlayOneShot(seePlayerSound);
                 _lightAnimationTimer = _lightAnimationDuration;
                 _shouldResetLights = true;
-                _sawPlayerCount = 3;
+                _sawPlayerCount++;
                 GetLightsClose();
                 break;
             }
