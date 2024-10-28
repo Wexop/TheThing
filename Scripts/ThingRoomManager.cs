@@ -62,6 +62,7 @@ public class ThingRoomManager: MonoBehaviour
         LightsManagement(true, lights);
         if(_playerNightVision?.Light) _playerNightVision.Light.enabled = true;
         ThingEnemyAI.MonsterAttackPlayer();
+        lights.Clear();
         StopCoroutine(LightAnimation());
         
     }
@@ -110,7 +111,7 @@ public class ThingRoomManager: MonoBehaviour
     {
         lightsInfos.ForEach(l =>
         {
-            l.Light.color = active ? GetRandomRedColor() : Color.black;
+            if(l.Light != null) l.Light.color = active ? GetRandomRedColor() : Color.black;
         });
     }
 

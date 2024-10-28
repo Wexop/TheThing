@@ -107,9 +107,13 @@ using LethalLib.Modules;
             {
                 Destroy(actualRoomObjectInstantiated);
                 Destroy(actualRoomObjectManager);
+                actualRoomObjectManager = null;
+                actualRoomObjectInstantiated = null;
+                Debug.Log($"Room Reset");
             }
             actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -4000, Quaternion.identity);
             actualRoomObjectManager = actualRoomObjectInstantiated.GetComponent<ThingRoomManager>();
+            Debug.Log($"{actualRoomObjectManager.name} Instantiated");
         }
         
         private void CreateFloatConfig(ConfigEntry<float> configEntry, float min = 0f, float max = 100f)
