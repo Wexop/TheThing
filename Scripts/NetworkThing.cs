@@ -40,5 +40,17 @@ public class NetworkThing
             thing.OnSetPlayerId(playerId);
         }
     }
+
+    [ServerRpc]
+    public static void EnableEscapeObjectServerRpc( int id)
+    {
+        EnableEscapeObjectClientRpc( id);
+    }
+
+    [ClientRpc]
+    public static void EnableEscapeObjectClientRpc( int id)
+    {
+        TheThingPlugin.instance.actualRoomObjectManager.EnableEscapeObject(id);
+    }
     
 }

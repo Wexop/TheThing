@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GameNetcodeStuff;
+using Unity.Netcode;
 using UnityEngine;
 using Object = System.Object;
 using Random = UnityEngine.Random;
@@ -31,7 +32,7 @@ public class ThingEnemyAI: EnemyAI
     
     List<LightInformation> lights = new List<LightInformation>();
 
-    private bool playerToKillIsLocal;
+    public bool playerToKillIsLocal;
     private Vector3 positionJumpScare;
     
     private bool _isActive;
@@ -163,7 +164,7 @@ public class ThingEnemyAI: EnemyAI
                 if (!_isActive && _teleportTimer < 0)
                 {
                     var pos = GetRandomNodeObjectPos();
-                    if (CheckIfPlayerAreInRange(pos))
+                    if (!CheckIfPlayerAreInRange(pos))
                     {
                         transform.position = pos;
                         SyncPositionToClients();
@@ -244,6 +245,7 @@ public class ThingEnemyAI: EnemyAI
                 ActivateMonster(false);
                 TheThingPlugin.instance.InstantiateRoom();
                 TheThingPlugin.instance.actualRoomObjectManager.ThingEnemyAI = this;
+                SpawnShovel();
                 if (targetPlayer)
                 {
                     if(targetPlayer.playerClientId == GameNetworkManager.Instance.localPlayerController.playerClientId) playerToKillIsLocal = true;
@@ -417,7 +419,7 @@ public class ThingEnemyAI: EnemyAI
         foreach (var closeObject in closeLights)
         {
             
-            if(closeObject.GetComponent<animatedSun>() != null) continue;
+            if(closeObject.GetComponent<animatedSun>() != null || closeObject.name == "NightVision") continue;
 
             FlashlightItem flashlightItem = closeObject.GetComponentInParent<FlashlightItem>();
             
@@ -428,6 +430,32 @@ public class ThingEnemyAI: EnemyAI
             lightInformation.flashlightItem = flashlightItem;
             lights.Add(lightInformation);
         }
+    }
+    
+    public void SpawnShovel()
+    {
+        if(!IsServer) return;
+        GameObject shovel = null;
+        NetworkManager.NetworkConfig.Prefabs.NetworkPrefabsLists?.ForEach(
+            list => list.PrefabList?.ToList().ForEach(
+                prefab =>
+                {
+                    GrabbableObject grabbableObject = prefab.Prefab.GetComponent<GrabbableObject>();
+                    if (grabbableObject != null)
+                    {
+                        if (grabbableObject.itemProperties.itemName == "Shovel")
+                        {
+                            shovel = prefab.Prefab;
+                        }
+                    } 
+
+                }) 
+        );
+        
+        var newShovel = Instantiate(shovel, TheThingPlugin.instance.actualRoomObjectInstantiated.transform);
+        newShovel.transform.localPosition = TheThingPlugin.instance.actualRoomObjectManager.shovelPosition;
+        newShovel.GetComponent<NetworkObject>().Spawn();
+        
     }
 
     public override void OnCollideWithPlayer(Collider other)

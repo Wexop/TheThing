@@ -1,10 +1,10 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using GameNetcodeStuff;
+using Unity.Netcode;
 
 namespace TheThing.Scripts;
 
@@ -14,19 +14,22 @@ public class ThingRoomManager: MonoBehaviour
 
     public AudioClip welcomeSound;
     public AudioClip scaryAmbientSound;
+
+    public Vector3 shovelPosition;
     
     public List<LightInformation> lights = new List<LightInformation>();
     public List<EscapeRoomObject> EscapeRoomObjects = new List<EscapeRoomObject>();
+    public List<int> escapeRoomNumbersHit = new List<int>();
 
     public ThingEnemyAI ThingEnemyAI;
     
     private LightInformation _playerNightVision;
 
     private float _lightAnimationsTimer;
-    private float _scaryAmbientAnimationTimer = 30f;
+    private float _scaryAmbientAnimationTimer = 120f;
     private bool _scarySoundPlayed;
 
-    private int escapeObjectToHit = 3;
+    private int escapeObjectToHit = 2;
     private int escapeObjectHitCount;
     
     public void OnPlayerSpawnIntoRoom()
@@ -36,8 +39,6 @@ public class ThingRoomManager: MonoBehaviour
 
         DisableEveryEscapeObject();
         EnableRandomEscapeObject(0);
-        
-        SpawnShovel();
 
     }
 
@@ -76,12 +77,11 @@ public class ThingRoomManager: MonoBehaviour
 
         GetAllLights();
         LightsManagement(false, lights);
-        if(_playerNightVision?.Light) _playerNightVision.Light.enabled = false;
+        //if(_playerNightVision?.Light) _playerNightVision.Light.enabled = false;
         DisableEveryEscapeObject();
         
         yield return new WaitForSeconds(3f);
-        if(_playerNightVision?.Light) _playerNightVision.Light.enabled = true;
-        LightsManagement(true, lights);
+        //if(_playerNightVision?.Light) _playerNightVision.Light.enabled = true;
         ThingEnemyAI.MonsterAttackPlayer();
         lights.Clear();
         StopCoroutine(LightAnimation());
@@ -149,8 +149,7 @@ public class ThingRoomManager: MonoBehaviour
         foreach (var closeObject in closeLights)
         {
             
-            if(closeObject.GetComponentInParent<animatedSun>() != null || closeObject.transform.parent.name == "HelmetLights" || closeObject == ThingEnemyAI.redLight) continue;
-
+            if(closeObject.GetComponentInParent<animatedSun>() != null || closeObject.transform.parent.name == "HelmetLights" || closeObject == ThingEnemyAI.redLight || closeObject.transform.parent.name.Contains("EscapeObject")) continue;
 
             FlashlightItem flashlightItem = closeObject.GetComponentInParent<FlashlightItem>();
             
@@ -170,40 +169,32 @@ public class ThingRoomManager: MonoBehaviour
         }
     }
 
-    private void SpawnShovel()
-    {
-        if(!NetworkManager.Singleton.IsServer) return;
-        GameObject shovel = null;
-        RoundManager.Instance.currentLevel.spawnableScrap.ToList().ForEach(
-            prefab =>
-            {
-                GrabbableObject grabbableObject = prefab.spawnableItem.spawnPrefab.GetComponent<GrabbableObject>();
-                if (grabbableObject != null)
-                {
-                    if (grabbableObject.itemProperties.itemName == "Shovel")
-                    {
-                        shovel = prefab.spawnableItem.spawnPrefab;
-                    }
-                }
-
-            });
-        
-        var newShovel = Instantiate(shovel, transform);
-        newShovel.transform.localPosition = new Vector3(1, 1, 0);
-        newShovel.GetComponent<NetworkObject>().Spawn();
-        
-    }
-
     public void EnableRandomEscapeObject(int notId)
     {
+        if(!ThingEnemyAI.playerToKillIsLocal) return;
         var index = Random.Range(0, EscapeRoomObjects.Count);
-        while (index == notId)
+        while (index == notId || escapeRoomNumbersHit.Contains(index))
         {
             index = Random.Range(0, EscapeRoomObjects.Count);
         }
+
+        NetworkThing.EnableEscapeObjectServerRpc(index);
+        escapeRoomNumbersHit.Add(index);
         
-        EscapeRoomObjects[index].gameObject.SetActive(true);
-        
+    }
+
+    public void EnableEscapeObject(int id)
+    {
+        EscapeRoomObjects[id].gameObject.SetActive(true);
+    }
+
+    public IEnumerator OnEscaped()
+    {
+        StopCoroutine(LightAnimation());
+        StopCoroutine(OnScaryAmbientRunned());
+        LightsManagement(false, lights);
+        yield return new WaitForSeconds(2f);
+        ThingEnemyAI.CancelMonsterAttack();
     }
 
     public void OnHitEscapeObject(int id)
@@ -211,14 +202,12 @@ public class ThingRoomManager: MonoBehaviour
         escapeObjectHitCount++;
         if (escapeObjectHitCount == escapeObjectToHit)
         {
-            StopCoroutine(OnScaryAmbientRunned());
-            ThingEnemyAI.CancelMonsterAttack();
+            StartCoroutine(OnEscaped());
+            
         }
         else
         {
-            EscapeRoomObjects[id].gameObject.SetActive(false);
             EnableRandomEscapeObject(id);
-            
         }
     }
     
