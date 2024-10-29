@@ -16,20 +16,40 @@ public class ThingRoomManager: MonoBehaviour
     public AudioClip scaryAmbientSound;
     
     public List<LightInformation> lights = new List<LightInformation>();
+    public List<EscapeRoomObject> EscapeRoomObjects = new List<EscapeRoomObject>();
 
     public ThingEnemyAI ThingEnemyAI;
     
     private LightInformation _playerNightVision;
 
     private float _lightAnimationsTimer;
-    //private float _scaryAmbientAnimationTimer = 20f;
-    private float _scaryAmbientAnimationTimer = 2f;
+    private float _scaryAmbientAnimationTimer = 30f;
     private bool _scarySoundPlayed;
+
+    private int escapeObjectToHit = 3;
+    private int escapeObjectHitCount;
     
     public void OnPlayerSpawnIntoRoom()
     {
-        GetAllLights();
         ambientSource.PlayOneShot(welcomeSound);
+        GetAllLights();
+
+        DisableEveryEscapeObject();
+        EnableRandomEscapeObject(0);
+        
+        SpawnShovel();
+
+    }
+
+    public void DisableEveryEscapeObject()
+    {
+        var i = 0;
+        EscapeRoomObjects.ForEach(o =>
+        {
+            o.id = i;
+            i++;
+            o.gameObject.SetActive(false);
+        });
     }
 
     public void Update()
@@ -42,7 +62,7 @@ public class ThingRoomManager: MonoBehaviour
             StartCoroutine(LightAnimation());
         }
 
-        if (_scaryAmbientAnimationTimer < 0 && !_scarySoundPlayed)
+        if (_scaryAmbientAnimationTimer < 0 && !_scarySoundPlayed && escapeObjectHitCount < escapeObjectToHit)
         {
             _scarySoundPlayed = true;
             ambientSource.PlayOneShot(scaryAmbientSound);
@@ -57,6 +77,7 @@ public class ThingRoomManager: MonoBehaviour
         GetAllLights();
         LightsManagement(false, lights);
         if(_playerNightVision?.Light) _playerNightVision.Light.enabled = false;
+        DisableEveryEscapeObject();
         
         yield return new WaitForSeconds(3f);
         if(_playerNightVision?.Light) _playerNightVision.Light.enabled = true;
@@ -149,6 +170,56 @@ public class ThingRoomManager: MonoBehaviour
         }
     }
 
+    private void SpawnShovel()
+    {
+        if(!NetworkManager.Singleton.IsServer) return;
+        GameObject shovel = null;
+        RoundManager.Instance.currentLevel.spawnableScrap.ToList().ForEach(
+            prefab =>
+            {
+                GrabbableObject grabbableObject = prefab.spawnableItem.spawnPrefab.GetComponent<GrabbableObject>();
+                if (grabbableObject != null)
+                {
+                    if (grabbableObject.itemProperties.itemName == "Shovel")
+                    {
+                        shovel = prefab.spawnableItem.spawnPrefab;
+                    }
+                }
 
+            });
+        
+        var newShovel = Instantiate(shovel, transform);
+        newShovel.transform.localPosition = new Vector3(1, 1, 0);
+        newShovel.GetComponent<NetworkObject>().Spawn();
+        
+    }
+
+    public void EnableRandomEscapeObject(int notId)
+    {
+        var index = Random.Range(0, EscapeRoomObjects.Count);
+        while (index == notId)
+        {
+            index = Random.Range(0, EscapeRoomObjects.Count);
+        }
+        
+        EscapeRoomObjects[index].gameObject.SetActive(true);
+        
+    }
+
+    public void OnHitEscapeObject(int id)
+    {
+        escapeObjectHitCount++;
+        if (escapeObjectHitCount == escapeObjectToHit)
+        {
+            StopCoroutine(OnScaryAmbientRunned());
+            ThingEnemyAI.CancelMonsterAttack();
+        }
+        else
+        {
+            EscapeRoomObjects[id].gameObject.SetActive(false);
+            EnableRandomEscapeObject(id);
+            
+        }
+    }
     
 }

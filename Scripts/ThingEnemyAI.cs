@@ -312,12 +312,34 @@ public class ThingEnemyAI: EnemyAI
 
     public void MonsterAttackPlayer()
     {
-        if (playerToKillIsLocal && targetPlayer && targetPlayer.isPlayerDead)
+        if ( targetPlayer && targetPlayer.isPlayerDead)
         {
             SwitchToBehaviourState(0);
         }
         _shouldTpToPlayer = true;
         if(IsOwner) SwitchToBehaviourState(4);
+    }
+
+    public void CancelMonsterAttack()
+    {
+
+        if (playerToKillIsLocal)
+        {
+            var player = GameNetworkManager.Instance.localPlayerController;
+            player.transform.position = StartOfRound.Instance.insideShipPositions[0].position;
+        }
+        
+        targetPlayer = null;
+        playerToKillIsLocal = false;
+        playerToKIll = null;
+        _teleportTimer = _timeBetweenTeleport;
+        
+        if (IsOwner)
+        {
+            var pos = GetRandomNodeObjectPos();
+            transform.position = pos;
+            SwitchToBehaviourState(0);
+        }
     }
     
     
@@ -363,7 +385,7 @@ public class ThingEnemyAI: EnemyAI
         
         StartOfRound.Instance.allPlayerScripts.ToList().ForEach(p =>
         {
-            if(Vector3.Distance(p.transform.position, position) < 30f) result = false;
+            if(Vector3.Distance(p.transform.position, position) < 50f) result = false;
         });
         
         return result;
