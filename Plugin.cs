@@ -62,11 +62,11 @@ namespace TheThing
             
             //GENERAL
             spawnMoonRarity = Config.Bind("General", "SpawnRarity", 
-                "Modded:40,ExperimentationLevel:20,AssuranceLevel:20,VowLevel:20,OffenseLevel:25,MarchLevel:25,RendLevel:30,DineLevel:30,TitanLevel:50,Adamance:50,Embrion:50,Artifice:55", 
+                "Modded:35,ExperimentationLevel:10,AssuranceLevel:10,VowLevel:10,OffenseLevel:20,MarchLevel:20,RendLevel:25,DineLevel:35,TitanLevel:35,Adamance:30,Embrion:35,Artifice:45", 
                 "Chance for thing to spawn for any moon, example => assurance:100,offense:50 . You need to restart the game.");
             CreateStringConfig(spawnMoonRarity, true);
             
-            maxSeePlayerCount = Config.Bind("Behavior", "MaxSeePlayerCount", 3,
+            maxSeePlayerCount = Config.Bind("Behavior", "MaxSeePlayerCount", 4,
                 "Max player see by the monster before teleporting him into his room. No need to restart the game !");
             CreateIntConfig(maxSeePlayerCount);
             
@@ -76,7 +76,7 @@ namespace TheThing
             
             TimeToEscapeRoom = Config.Bind("Behavior", "TimeToEscapeRoom", 90f,
                 "Time to escape the room. No need to restart the game !");
-            CreateFloatConfig(TimeToEscapeRoom);
+            CreateFloatConfig(TimeToEscapeRoom, 0f, 300f);
             
             monsterToHitToEscapeRoom = Config.Bind("Behavior", "MonsterToHitToEscapeRoom", 2,
                 "Monsters to hit to escape the room. No need to restart the game !");
