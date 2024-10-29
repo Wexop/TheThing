@@ -192,7 +192,7 @@ public class ThingEnemyAI: EnemyAI
             {
                 if (_lightAnimationTimer <= 0.5f)
                 {
-                     SwitchToBehaviourState(_sawPlayerCount == 3 ? 3: 0);
+                     SwitchToBehaviourState(_sawPlayerCount >= 3 ? 3: 0);
                 }
                 break;
             }
@@ -249,25 +249,27 @@ public class ThingEnemyAI: EnemyAI
                 if (targetPlayer)
                 {
                     if(targetPlayer.playerClientId == GameNetworkManager.Instance.localPlayerController.playerClientId) playerToKillIsLocal = true;
+                    targetPlayer.transform.position = TheThingPlugin.instance.actualRoomObjectInstantiated.transform.position + new Vector3(1,1,0);
                     if (playerToKillIsLocal)
                     {
                         var player = GameNetworkManager.Instance.localPlayerController;
                         player.DropAllHeldItemsAndSync();
                         player.transform.position = TheThingPlugin.instance.actualRoomObjectInstantiated.transform.position + new Vector3(1,1,0);
-                        TheThingPlugin.instance.actualRoomObjectManager.OnPlayerSpawnIntoRoom();
+                        
                     }
                 }
+                TheThingPlugin.instance.actualRoomObjectManager.OnPlayerSpawnIntoRoom();
 
                 break;
             }
             case 4:
             {
+                _sawPlayerCount = 0;
                 ActivateMonster(true);
                 redLight.enabled = true;
                 StartCoroutine(JumpScareAnimation());
                 creatureAnimator.SetBool(Jumpscare, true);
                 creatureSFX.PlayOneShot(JumpscareSound);
-                _sawPlayerCount = 0;
                 positionJumpScare = targetPlayer.gameplayCamera.transform.position + targetPlayer.gameplayCamera.transform.forward * 1.4f;
                 if (playerToKillIsLocal)
                 {
@@ -324,13 +326,15 @@ public class ThingEnemyAI: EnemyAI
 
     public void CancelMonsterAttack()
     {
-
+        
+        StopCoroutine(JumpScareAnimation());
+        _sawPlayerCount = 0;
         if (playerToKillIsLocal)
         {
             var player = GameNetworkManager.Instance.localPlayerController;
             player.transform.position = StartOfRound.Instance.insideShipPositions[0].position;
         }
-        
+        targetPlayer.transform.position = StartOfRound.Instance.insideShipPositions[0].position;
         targetPlayer = null;
         playerToKillIsLocal = false;
         playerToKIll = null;

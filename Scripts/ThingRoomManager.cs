@@ -202,8 +202,7 @@ public class ThingRoomManager: MonoBehaviour
         escapeObjectHitCount++;
         if (escapeObjectHitCount == escapeObjectToHit)
         {
-            StartCoroutine(OnEscaped());
-            
+            NetworkThing.EscapeRoomServerRpc();
         }
         else
         {

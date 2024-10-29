@@ -29,6 +29,8 @@ public class EscapeRoomObject : MonoBehaviour, IHittable
         animator.SetTrigger(Disapear);
         thingRoomManager.OnHitEscapeObject(id);
         alreadyHit = true;
+
+        GetComponentInChildren<Light>().enabled = false;
                 
         AudioSource.PlayOneShot(onHitSound);
         return true;

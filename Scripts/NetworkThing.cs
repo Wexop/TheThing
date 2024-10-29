@@ -52,5 +52,17 @@ public class NetworkThing
     {
         TheThingPlugin.instance.actualRoomObjectManager.EnableEscapeObject(id);
     }
+
+    [ServerRpc]
+    public static void EscapeRoomServerRpc( )
+    {
+        EscapeRoomClientRpc();
+    }
+
+    [ClientRpc]
+    public static void EscapeRoomClientRpc( )
+    {
+        TheThingPlugin.instance.actualRoomObjectManager.StartCoroutine(TheThingPlugin.instance.actualRoomObjectManager.OnEscaped());
+    }
     
 }

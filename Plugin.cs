@@ -110,7 +110,7 @@ using LethalLib.Modules;
                 actualRoomObjectManager = null;
                 actualRoomObjectInstantiated = null;
             }
-            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -4000, Quaternion.identity);
+            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -2000, Quaternion.identity);
             actualRoomObjectManager = actualRoomObjectInstantiated.GetComponent<ThingRoomManager>();
         }
         
