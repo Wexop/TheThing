@@ -74,7 +74,7 @@ namespace TheThing
                 "Time to wait before teleport to another place after the thing see a player. No need to restart the game !");
             CreateFloatConfig(timeBetweenTeleport);
             
-            TimeToEscapeRoom = Config.Bind("Behavior", "TimeToEscapeRoom", 75f,
+            TimeToEscapeRoom = Config.Bind("Behavior", "TimeToEscapeRoom", 90f,
                 "Time to escape the room. No need to restart the game !");
             CreateFloatConfig(TimeToEscapeRoom);
             
