@@ -43,7 +43,7 @@ public class ThingEnemyAI: EnemyAI
     private float _lightAnimationDuration = 3f;
     private float _lightAnimationTimer;
     private int _lastNodeIndex;
-    private float _timeBetweenTeleport = 5f;
+    private float _timeBetweenTeleport = 10f;
     private float _teleportTimer;
     
     
@@ -55,6 +55,7 @@ public class ThingEnemyAI: EnemyAI
         ActivateMonster(false);
         agent.speed = 0;
         debugEnemyAI = true;
+        _timeBetweenTeleport = TheThingPlugin.instance.timeBetweenTeleport.Value;
 
     }
 
@@ -113,8 +114,9 @@ public class ThingEnemyAI: EnemyAI
             {
                 lights.ForEach(l =>
                 {
-                    var instensity = (_lightAnimationTimer / _lightAnimationDuration);
-                    l.Light.intensity = instensity * l.intensity;
+                    var instensity = (Math.Clamp(_lightAnimationTimer, 0f, _lightAnimationDuration) / _lightAnimationDuration);
+                    if (instensity < 0.2f) instensity = 0f;
+                    l.Light.intensity = (instensity * l.intensity);
                     if (l.flashlightItem)
                     {
                         l.flashlightItem.flashlightBulb.color =
@@ -316,12 +318,13 @@ public class ThingEnemyAI: EnemyAI
 
     public void MonsterAttackPlayer()
     {
+        Debug.Log("MONSTER ATTACK");
         if ( targetPlayer && targetPlayer.isPlayerDead)
         {
             SwitchToBehaviourState(0);
         }
         _shouldTpToPlayer = true;
-        if(IsOwner) SwitchToBehaviourState(4);
+        SwitchToBehaviourServerRpc(4);
     }
 
     public void CancelMonsterAttack()
@@ -397,7 +400,7 @@ public class ThingEnemyAI: EnemyAI
         
         StartOfRound.Instance.allPlayerScripts.ToList().ForEach(p =>
         {
-            if(Vector3.Distance(p.gameplayCamera.transform.position, position) < 50f) result = false;
+            if(Vector3.Distance(p.gameplayCamera.transform.position, position) < 55f) result = false;
         });
         
         return result;
@@ -429,7 +432,7 @@ public class ThingEnemyAI: EnemyAI
         foreach (var closeObject in closeLights)
         {
             
-            if(closeObject.GetComponent<animatedSun>() != null || closeObject.name == "NightVision") continue;
+            if(closeObject.GetComponentInParent<animatedSun>() != null || closeObject.name == "NightVision" || closeObject.name.Contains("Spot Light") || closeObject.name.Contains("RedLight") || closeObject.name.Contains("RadarCamNightVision")) continue;
 
             FlashlightItem flashlightItem = closeObject.GetComponentInParent<FlashlightItem>();
             
@@ -470,8 +473,8 @@ public class ThingEnemyAI: EnemyAI
 
     public override void OnCollideWithPlayer(Collider other)
     {
-        var player = MeetsStandardPlayerCollisionConditions(other);
-        if (player)
+        PlayerControllerB player = other.gameObject.GetComponent<PlayerControllerB>();
+        if (player != null && player.actualClientId == GameNetworkManager.Instance.localPlayerController.actualClientId)
         {
             targetPlayer = GameNetworkManager.Instance.localPlayerController;
             playerToKillIsLocal = true;

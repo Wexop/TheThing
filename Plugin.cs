@@ -34,6 +34,9 @@ namespace TheThing
         public ConfigEntry<string> spawnMoonRarity;
         
         public ConfigEntry<int> maxSeePlayerCount;
+        public ConfigEntry<float> timeBetweenTeleport;
+        public ConfigEntry<float> TimeToEscapeRoom;
+        public ConfigEntry<int> monsterToHitToEscapeRoom;
 
         void Awake()
         {
@@ -66,6 +69,19 @@ namespace TheThing
             maxSeePlayerCount = Config.Bind("Behavior", "MaxSeePlayerCount", 3,
                 "Max player see by the monster before teleporting him into his room. No need to restart the game !");
             CreateIntConfig(maxSeePlayerCount);
+            
+            timeBetweenTeleport = Config.Bind("Behavior", "timeBetweenTeleport", 20f,
+                "Time to wait before teleport to another place after the thing see a player. No need to restart the game !");
+            CreateFloatConfig(timeBetweenTeleport);
+            
+            TimeToEscapeRoom = Config.Bind("Behavior", "TimeToEscapeRoom", 75f,
+                "Time to escape the room. No need to restart the game !");
+            CreateFloatConfig(TimeToEscapeRoom);
+            
+            monsterToHitToEscapeRoom = Config.Bind("Behavior", "MonsterToHitToEscapeRoom", 2,
+                "Monsters to hit to escape the room. No need to restart the game !");
+            CreateIntConfig(monsterToHitToEscapeRoom);
+            
         }
         
         

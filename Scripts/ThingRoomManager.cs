@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,13 @@ public class ThingRoomManager: MonoBehaviour
 
     private int escapeObjectToHit = 2;
     private int escapeObjectHitCount;
-    
+
+    public void Start()
+    {
+        _scaryAmbientAnimationTimer = TheThingPlugin.instance.TimeToEscapeRoom.Value - 22f;
+        escapeObjectToHit = TheThingPlugin.instance.monsterToHitToEscapeRoom.Value;
+    }
+
     public void OnPlayerSpawnIntoRoom()
     {
         ambientSource.PlayOneShot(welcomeSound);
@@ -156,7 +163,7 @@ public class ThingRoomManager: MonoBehaviour
         
         var closeLights = FindObjectsByType<Light>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList().FindAll(light =>
         {
-            if (Vector3.Distance(light.transform.position, transform.position) < 300f) return light;
+            if (Vector3.Distance(light.transform.position, transform.position) < 150f && Vector3.Distance(new Vector3(0,light.transform.position.y, 0), new Vector3(0,transform.position.y,0)) < 25f) return light;
             return false;
         } );
         
@@ -164,6 +171,7 @@ public class ThingRoomManager: MonoBehaviour
         {
             
             if(closeObject.GetComponentInParent<animatedSun>() != null || closeObject.transform.parent.name == "HelmetLights" || closeObject == ThingEnemyAI.redLight || closeObject.transform.parent.name.Contains("EscapeObject")) continue;
+            if(closeObject.name.Contains("Spot Light") || closeObject.name.Contains("RedLight") || closeObject.name.Contains("RadarCamNightVision") || closeObject.name.Contains("Near") || closeObject.name.Contains("VisorCamera") || closeObject.name.Contains("MainCamera")) continue;
 
             FlashlightItem flashlightItem = closeObject.GetComponentInParent<FlashlightItem>();
             
