@@ -326,15 +326,12 @@ public class ThingEnemyAI: EnemyAI
 
     public void CancelMonsterAttack()
     {
-        
-        StopCoroutine(JumpScareAnimation());
         _sawPlayerCount = 0;
         if (playerToKillIsLocal)
         {
             var player = GameNetworkManager.Instance.localPlayerController;
             player.transform.position = StartOfRound.Instance.insideShipPositions[0].position;
         }
-        targetPlayer.transform.position = StartOfRound.Instance.insideShipPositions[0].position;
         targetPlayer = null;
         playerToKillIsLocal = false;
         playerToKIll = null;
@@ -345,6 +342,15 @@ public class ThingEnemyAI: EnemyAI
             var pos = GetRandomNodeObjectPos();
             transform.position = pos;
             SwitchToBehaviourState(0);
+        }
+
+        try
+        {
+            StopCoroutine(JumpScareAnimation());
+        }
+        catch
+        {
+            // ignored
         }
     }
     

@@ -11,7 +11,7 @@ using LethalConfig.ConfigItems.Options;
 using UnityEngine;
 using LethalLib.Modules;
 
- namespace TheThing
+namespace TheThing
 {
     [BepInDependency(StaticNetcodeLib.StaticNetcodeLib.Guid)]
     [BepInDependency("evaisa.lethallib", "0.15.1")]
@@ -110,7 +110,7 @@ using LethalLib.Modules;
                 actualRoomObjectManager = null;
                 actualRoomObjectInstantiated = null;
             }
-            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -2000, Quaternion.identity);
+            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -1000, Quaternion.identity);
             actualRoomObjectManager = actualRoomObjectInstantiated.GetComponent<ThingRoomManager>();
         }
         
