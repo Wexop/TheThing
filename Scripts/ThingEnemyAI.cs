@@ -250,15 +250,7 @@ public class ThingEnemyAI: EnemyAI
                 SpawnShovel();
                 if (targetPlayer)
                 {
-                    if(targetPlayer.playerClientId == GameNetworkManager.Instance.localPlayerController.playerClientId) playerToKillIsLocal = true;
-                    targetPlayer.transform.position = TheThingPlugin.instance.actualRoomObjectInstantiated.transform.position + new Vector3(1,1,0);
-                    if (playerToKillIsLocal)
-                    {
-                        var player = GameNetworkManager.Instance.localPlayerController;
-                        player.DropAllHeldItemsAndSync();
-                        player.transform.position = TheThingPlugin.instance.actualRoomObjectInstantiated.transform.position + new Vector3(1,1,0);
-                        
-                    }
+                    StartCoroutine(DropItemsAndTeleportPlayer());
                 }
                 TheThingPlugin.instance.actualRoomObjectManager.OnPlayerSpawnIntoRoom();
 
@@ -291,6 +283,23 @@ public class ThingEnemyAI: EnemyAI
     {
         lastPlayerIdToKill = playerId;
         targetPlayer = StartOfRound.Instance.allPlayerScripts.ToList().Find(p => p.actualClientId == playerId);
+    }
+
+    private IEnumerator DropItemsAndTeleportPlayer()
+    {
+        if(targetPlayer.playerClientId == GameNetworkManager.Instance.localPlayerController.playerClientId) playerToKillIsLocal = true;
+        if(playerToKillIsLocal) GameNetworkManager.Instance.localPlayerController.DropAllHeldItemsAndSync();
+        
+        yield return new WaitForSeconds(0.3f);
+        
+        targetPlayer.transform.position = TheThingPlugin.instance.actualRoomObjectInstantiated.transform.position + new Vector3(1,1,0);
+        if (playerToKillIsLocal)
+        {
+            var player = GameNetworkManager.Instance.localPlayerController;
+                        
+            player.transform.position = TheThingPlugin.instance.actualRoomObjectInstantiated.transform.position + new Vector3(1,1,0);
+                        
+        }
     }
 
     private IEnumerator JumpScareAnimation()
