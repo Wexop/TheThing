@@ -26,7 +26,7 @@ public class ThingRoomManager: MonoBehaviour
     private LightInformation _playerNightVision;
 
     private float _lightAnimationsTimer;
-    private float _scaryAmbientAnimationTimer = 120f;
+    private float _scaryAmbientAnimationTimer = 90f;
     private bool _scarySoundPlayed;
     private bool _hasEscaped;
 
@@ -71,7 +71,7 @@ public class ThingRoomManager: MonoBehaviour
             StartCoroutine(OnScaryAmbientRunned());
         }
         
-        if(ThingEnemyAI.playerToKillIsLocal && GameNetworkManager.Instance.localPlayerController.isPlayerDead && !_hasEscaped)
+        if(ThingEnemyAI && ThingEnemyAI.playerToKillIsLocal && GameNetworkManager.Instance.localPlayerController.isPlayerDead && !_hasEscaped)
         {
             _hasEscaped = true;
             NetworkThing.EscapeRoomServerRpc();
@@ -89,14 +89,14 @@ public class ThingRoomManager: MonoBehaviour
         DisableEveryEscapeObject();
         
         ambientSource.PlayOneShot(welcomeSound);
-        if (ThingEnemyAI.playerToKillIsLocal)
+        if (ThingEnemyAI && ThingEnemyAI.playerToKillIsLocal)
         {
             GameNetworkManager.Instance.localPlayerController.JumpToFearLevel(0.8f);
         }
         
         yield return new WaitForSeconds(4f);
         //if(_playerNightVision?.Light) _playerNightVision.Light.enabled = true;
-        ThingEnemyAI.MonsterAttackPlayer();
+        if(ThingEnemyAI) ThingEnemyAI.MonsterAttackPlayer();
         lights.Clear();
         StopCoroutine(LightAnimation());
         
@@ -210,7 +210,7 @@ public class ThingRoomManager: MonoBehaviour
         LightsManagement(false, lights);
         ambientSource.PlayOneShot(welcomeSound);
         yield return new WaitForSeconds(4f);
-        ThingEnemyAI.CancelMonsterAttack();
+        if(ThingEnemyAI) ThingEnemyAI.CancelMonsterAttack();
     }
 
     public void OnHitEscapeObject(int id)

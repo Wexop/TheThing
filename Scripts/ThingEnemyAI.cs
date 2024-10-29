@@ -43,7 +43,7 @@ public class ThingEnemyAI: EnemyAI
     private float _lightAnimationDuration = 3f;
     private float _lightAnimationTimer;
     private int _lastNodeIndex;
-    private float _timeBetweenTeleport = 1f;
+    private float _timeBetweenTeleport = 5f;
     private float _teleportTimer;
     
     
@@ -164,7 +164,7 @@ public class ThingEnemyAI: EnemyAI
                 if (!_isActive && _teleportTimer < 0)
                 {
                     var pos = GetRandomNodeObjectPos();
-                    if (!CheckIfPlayerAreInRange(pos))
+                    if (CheckIfPlayerAreInRange(pos))
                     {
                         transform.position = pos;
                         SyncPositionToClients();
@@ -192,7 +192,7 @@ public class ThingEnemyAI: EnemyAI
             {
                 if (_lightAnimationTimer <= 0.5f)
                 {
-                     SwitchToBehaviourState(_sawPlayerCount >= 3 ? 3: 0);
+                     SwitchToBehaviourState(_sawPlayerCount >= TheThingPlugin.instance.maxSeePlayerCount.Value ? 3: 0);
                 }
                 break;
             }
@@ -397,7 +397,7 @@ public class ThingEnemyAI: EnemyAI
         
         StartOfRound.Instance.allPlayerScripts.ToList().ForEach(p =>
         {
-            if(Vector3.Distance(p.transform.position, position) < 50f) result = false;
+            if(Vector3.Distance(p.gameplayCamera.transform.position, position) < 50f) result = false;
         });
         
         return result;

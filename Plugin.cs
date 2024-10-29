@@ -63,7 +63,7 @@ namespace TheThing
                 "Chance for thing to spawn for any moon, example => assurance:100,offense:50 . You need to restart the game.");
             CreateStringConfig(spawnMoonRarity, true);
             
-            maxSeePlayerCount = Config.Bind("Behavior", "MaxSeePlayerCount", 1,
+            maxSeePlayerCount = Config.Bind("Behavior", "MaxSeePlayerCount", 3,
                 "Max player see by the monster before teleporting him into his room. No need to restart the game !");
             CreateIntConfig(maxSeePlayerCount);
         }
@@ -110,7 +110,7 @@ namespace TheThing
                 actualRoomObjectManager = null;
                 actualRoomObjectInstantiated = null;
             }
-            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -1000, Quaternion.identity);
+            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -500, Quaternion.identity);
             actualRoomObjectManager = actualRoomObjectInstantiated.GetComponent<ThingRoomManager>();
         }
         
