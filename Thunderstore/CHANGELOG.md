@@ -1,6 +1,6 @@
 # Changelog
 
-### v1.0.2
+### v1.0.2 & v1.0.3
 
 - Add enemy power level config
 - Update default spawn rarity values

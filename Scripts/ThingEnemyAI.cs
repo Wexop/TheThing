@@ -409,7 +409,7 @@ public class ThingEnemyAI: EnemyAI
         
         StartOfRound.Instance.allPlayerScripts.ToList().ForEach(p =>
         {
-            if(Vector3.Distance(p.gameplayCamera.transform.position, position) < 55f) result = false;
+            if(Vector3.Distance(p.gameplayCamera.transform.position, position) < TheThingPlugin.instance.minDistanceBetweenPlayerToTeleport.Value) result = false;
         });
         
         return result;

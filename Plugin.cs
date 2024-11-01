@@ -21,7 +21,7 @@ namespace TheThing
 
         const string GUID = "wexop.the_thing";
         const string NAME = "TheThing";
-        const string VERSION = "1.0.2";
+        const string VERSION = "1.0.3";
 
         public GameObject roomObject;
         public GameObject actualRoomObjectInstantiated;
@@ -35,6 +35,7 @@ namespace TheThing
         
         public ConfigEntry<int> maxSeePlayerCount;
         public ConfigEntry<float> timeBetweenTeleport;
+        public ConfigEntry<float> minDistanceBetweenPlayerToTeleport;
         public ConfigEntry<float> TimeToEscapeRoom;
         public ConfigEntry<int> monsterToHitToEscapeRoom;
         public ConfigEntry<float> enemyPower;
@@ -79,6 +80,10 @@ namespace TheThing
             timeBetweenTeleport = Config.Bind("Behavior", "timeBetweenTeleport", 20f,
                 "Time to wait before teleport to another place after the thing see a player. No need to restart the game !");
             CreateFloatConfig(timeBetweenTeleport);
+            
+            minDistanceBetweenPlayerToTeleport = Config.Bind("Behavior", "minDistanceBetweenPlayerToTeleport", 45f,
+                "Minimum distance to have with any player to teleport somewhere to wait. No need to restart the game !");
+            CreateFloatConfig(minDistanceBetweenPlayerToTeleport);
             
             TimeToEscapeRoom = Config.Bind("Behavior", "TimeToEscapeRoom", 90f,
                 "Time to escape the room. No need to restart the game !");
