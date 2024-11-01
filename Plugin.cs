@@ -21,7 +21,7 @@ namespace TheThing
 
         const string GUID = "wexop.the_thing";
         const string NAME = "TheThing";
-        const string VERSION = "1.0.1";
+        const string VERSION = "1.0.2";
 
         public GameObject roomObject;
         public GameObject actualRoomObjectInstantiated;
@@ -37,6 +37,7 @@ namespace TheThing
         public ConfigEntry<float> timeBetweenTeleport;
         public ConfigEntry<float> TimeToEscapeRoom;
         public ConfigEntry<int> monsterToHitToEscapeRoom;
+        public ConfigEntry<float> enemyPower;
 
         void Awake()
         {
@@ -62,10 +63,15 @@ namespace TheThing
             
             //GENERAL
             spawnMoonRarity = Config.Bind("General", "SpawnRarity", 
-                "Modded:35,ExperimentationLevel:10,AssuranceLevel:10,VowLevel:10,OffenseLevel:20,MarchLevel:20,RendLevel:25,DineLevel:35,TitanLevel:35,Adamance:30,Embrion:35,Artifice:45", 
+                "Modded:40,ExperimentationLevel:20,AssuranceLevel:20,VowLevel:20,OffenseLevel:25,MarchLevel:25,RendLevel:30,DineLevel:30,TitanLevel:40,Adamance:35,Embrion:40,Artifice:45", 
                 "Chance for thing to spawn for any moon, example => assurance:100,offense:50 . You need to restart the game.");
             CreateStringConfig(spawnMoonRarity, true);
+            enemyPower = Config.Bind("General", "EnemyPower", 
+                    2f,
+                "Enemy power for Thing monster. You need to restart the game.");
+            CreateFloatConfig(enemyPower,0f, 10f );
             
+            //BEHAVIOR
             maxSeePlayerCount = Config.Bind("Behavior", "MaxSeePlayerCount", 4,
                 "Max player see by the monster before teleporting him into his room. No need to restart the game !");
             CreateIntConfig(maxSeePlayerCount);
@@ -104,7 +110,7 @@ namespace TheThing
             terminalKeywordBigEyes.word = "Thing";
             
             
-            RegisterUtil.RegisterEnemyWithConfig(spawnMoonRarity.Value, creature,terminalNodeBigEyes , terminalKeywordBigEyes, creature.PowerLevel, creature.MaxCount);
+            RegisterUtil.RegisterEnemyWithConfig(spawnMoonRarity.Value, creature,terminalNodeBigEyes , terminalKeywordBigEyes, instance.enemyPower.Value, creature.MaxCount);
 
         }
 
