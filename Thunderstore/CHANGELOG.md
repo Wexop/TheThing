@@ -1,5 +1,10 @@
 # Changelog
 
+### v1.0.4
+
+- Change some behavior in stalking phase
+- Add fog in the room, to be scarier :)
+
 ### v1.0.2 & v1.0.3
 
 - Add enemy power level config

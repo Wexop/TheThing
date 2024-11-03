@@ -45,6 +45,8 @@ public class ThingEnemyAI: EnemyAI
     private int _lastNodeIndex;
     private float _timeBetweenTeleport = 10f;
     private float _teleportTimer;
+    private float _notSeePlayerTimer;
+    private float _changePositionSeePlayerDuration = 45f;
     
     
     public override void Start()
@@ -76,6 +78,10 @@ public class ThingEnemyAI: EnemyAI
         aiInterval -= Time.deltaTime;
         _lightAnimationTimer -= Time.deltaTime;
         _teleportTimer -= Time.deltaTime;
+        if(currentBehaviourStateIndex == 1 )
+        {
+            _notSeePlayerTimer -= Time.deltaTime;
+        }
         
         if (lastBehaviorState != currentBehaviourStateIndex)
         {
@@ -168,6 +174,7 @@ public class ThingEnemyAI: EnemyAI
                     var pos = GetRandomNodeObjectPos();
                     if (CheckIfPlayerAreInRange(pos))
                     {
+                        _notSeePlayerTimer = _changePositionSeePlayerDuration;
                         transform.position = pos;
                         SyncPositionToClients();
                         SwitchToBehaviourState(1);
@@ -179,6 +186,10 @@ public class ThingEnemyAI: EnemyAI
             case 1:
             {
                 TargetClosestPlayer(requireLineOfSight: true);
+                if (_notSeePlayerTimer < 0)
+                {
+                    SwitchToBehaviourState(0);
+                }
                 if(targetPlayer == null) break;
                 if (PlayerIsTargetable(targetPlayer))
                 {

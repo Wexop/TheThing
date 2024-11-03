@@ -21,7 +21,7 @@ namespace TheThing
 
         const string GUID = "wexop.the_thing";
         const string NAME = "TheThing";
-        const string VERSION = "1.0.3";
+        const string VERSION = "1.0.4";
 
         public GameObject roomObject;
         public GameObject actualRoomObjectInstantiated;
