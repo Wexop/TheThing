@@ -21,7 +21,7 @@ namespace TheThing
 
         const string GUID = "wexop.the_thing";
         const string NAME = "TheThing";
-        const string VERSION = "1.0.4";
+        const string VERSION = "1.0.5";
 
         public GameObject roomObject;
         public GameObject actualRoomObjectInstantiated;
@@ -39,6 +39,8 @@ namespace TheThing
         public ConfigEntry<float> TimeToEscapeRoom;
         public ConfigEntry<int> monsterToHitToEscapeRoom;
         public ConfigEntry<float> enemyPower;
+        
+        public ConfigEntry<float> roomFogDistance;
 
         void Awake()
         {
@@ -85,14 +87,22 @@ namespace TheThing
                 "Minimum distance to have with any player to teleport somewhere to wait. No need to restart the game !");
             CreateFloatConfig(minDistanceBetweenPlayerToTeleport);
             
-            TimeToEscapeRoom = Config.Bind("Behavior", "TimeToEscapeRoom", 90f,
-                "Time to escape the room. No need to restart the game !");
-            CreateFloatConfig(TimeToEscapeRoom, 0f, 300f);
-            
             monsterToHitToEscapeRoom = Config.Bind("Behavior", "MonsterToHitToEscapeRoom", 2,
                 "Monsters to hit to escape the room. No need to restart the game !");
             CreateIntConfig(monsterToHitToEscapeRoom);
             
+            //ROOM SETTINGS
+            
+            roomFogDistance = Config.Bind("RoomSettings", "roomFogDistance", 10f,
+                "Thing room fog distance. No need to restart the game !");
+            CreateFloatConfig(roomFogDistance);
+            
+            
+            
+            TimeToEscapeRoom = Config.Bind("RoomSettings", "TimeToEscapeRoom", 90f,
+                "Time to escape the room. No need to restart the game !");
+            CreateFloatConfig(TimeToEscapeRoom, 0f, 300f);
+
         }
         
         
@@ -130,6 +140,13 @@ namespace TheThing
 
         public void InstantiateRoom()
         {
+            DestroyRoom();
+            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -500, Quaternion.identity);
+            actualRoomObjectManager = actualRoomObjectInstantiated.GetComponent<ThingRoomManager>();
+        }
+
+        public void DestroyRoom()
+        {
             if (actualRoomObjectInstantiated != null)
             {
                 Destroy(actualRoomObjectInstantiated);
@@ -137,8 +154,6 @@ namespace TheThing
                 actualRoomObjectManager = null;
                 actualRoomObjectInstantiated = null;
             }
-            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -500, Quaternion.identity);
-            actualRoomObjectManager = actualRoomObjectInstantiated.GetComponent<ThingRoomManager>();
         }
         
         private void CreateFloatConfig(ConfigEntry<float> configEntry, float min = 0f, float max = 100f)

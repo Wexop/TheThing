@@ -1,5 +1,11 @@
 # Changelog
 
+### v1.0.5
+
+- Add config to change fog distance in the room
+- Change default fog distance in the room
+- Increase perf by destroying the room when a player quit it
+
 ### v1.0.4
 
 - Change some behavior in stalking phase

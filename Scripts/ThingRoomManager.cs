@@ -6,11 +6,13 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using GameNetcodeStuff;
 using Unity.Netcode;
+using UnityEngine.Rendering.HighDefinition;
 
 namespace TheThing.Scripts;
 
 public class ThingRoomManager: MonoBehaviour
 {
+    
     public AudioSource ambientSource;
 
     public AudioClip welcomeSound;
@@ -21,6 +23,7 @@ public class ThingRoomManager: MonoBehaviour
     public List<LightInformation> lights = new List<LightInformation>();
     public List<EscapeRoomObject> EscapeRoomObjects = new List<EscapeRoomObject>();
     public List<int> escapeRoomNumbersHit = new List<int>();
+    public LocalVolumetricFog localVolumetricFog;
 
     public ThingEnemyAI ThingEnemyAI;
     
@@ -38,6 +41,7 @@ public class ThingRoomManager: MonoBehaviour
     {
         _scaryAmbientAnimationTimer = TheThingPlugin.instance.TimeToEscapeRoom.Value - 22f;
         escapeObjectToHit = TheThingPlugin.instance.monsterToHitToEscapeRoom.Value;
+        localVolumetricFog.parameters.meanFreePath = TheThingPlugin.instance.roomFogDistance.Value;
     }
 
     public void OnPlayerSpawnIntoRoom()

@@ -334,6 +334,16 @@ public class ThingEnemyAI: EnemyAI
             transform.position = pos;
             SwitchToBehaviourState(0);
         }
+
+        StartCoroutine(DestroyRoom());
+    }
+
+    private IEnumerator DestroyRoom()
+    {
+        yield return new WaitForSeconds(2f);
+
+        TheThingPlugin.instance.DestroyRoom();
+
     }
 
     public void MonsterAttackPlayer()
@@ -369,6 +379,7 @@ public class ThingEnemyAI: EnemyAI
 
         try
         {
+            StartCoroutine(DestroyRoom());
             StopCoroutine(JumpScareAnimation());
         }
         catch
