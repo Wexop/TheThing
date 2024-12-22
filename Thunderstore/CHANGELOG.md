@@ -1,5 +1,10 @@
 # Changelog
 
+### v1.0.6
+
+- Change room Y position, to fix compatibility with backrooms mod
+- Add a config to change room Y position
+
 ### v1.0.5
 
 - Add config to change fog distance in the room

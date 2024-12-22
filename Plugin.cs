@@ -21,7 +21,7 @@ namespace TheThing
 
         const string GUID = "wexop.the_thing";
         const string NAME = "TheThing";
-        const string VERSION = "1.0.5";
+        const string VERSION = "1.0.6";
 
         public GameObject roomObject;
         public GameObject actualRoomObjectInstantiated;
@@ -41,6 +41,7 @@ namespace TheThing
         public ConfigEntry<float> enemyPower;
         
         public ConfigEntry<float> roomFogDistance;
+        public ConfigEntry<float> roomPosY;
 
         void Awake()
         {
@@ -93,15 +94,17 @@ namespace TheThing
             
             //ROOM SETTINGS
             
-            roomFogDistance = Config.Bind("RoomSettings", "roomFogDistance", 10f,
+            roomFogDistance = Config.Bind("RoomSettings", "roomFogDistance", 5f,
                 "Thing room fog distance. No need to restart the game !");
             CreateFloatConfig(roomFogDistance);
-            
-            
             
             TimeToEscapeRoom = Config.Bind("RoomSettings", "TimeToEscapeRoom", 90f,
                 "Time to escape the room. No need to restart the game !");
             CreateFloatConfig(TimeToEscapeRoom, 0f, 300f);
+            
+            roomPosY = Config.Bind("RoomSettings", "roomPosY", 550f,
+                "Room Y position. No need to restart the game !");
+            CreateFloatConfig(roomPosY, 0f, 3000f);
 
         }
         
@@ -141,7 +144,7 @@ namespace TheThing
         public void InstantiateRoom()
         {
             DestroyRoom();
-            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -500, Quaternion.identity);
+            actualRoomObjectInstantiated = Instantiate(roomObject, Vector3.up * -roomPosY.Value, Quaternion.identity);
             actualRoomObjectManager = actualRoomObjectInstantiated.GetComponent<ThingRoomManager>();
         }
 

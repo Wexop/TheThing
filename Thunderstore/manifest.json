@@ -1,6 +1,6 @@
 {
   "name": "TheThing",
-  "version_number": "1.0.5",
+  "version_number": "1.0.6",
   "website_url": "https://github.com/Wexop/TheThing",
   "description": "[V60+] Add a new monster to the game, don't look at it too much...",
   "dependencies": [
