@@ -61,11 +61,6 @@ public class ThingEnemyAI: EnemyAI
 
     }
 
-    public override void EnableEnemyMesh(bool enable, bool overrideDoNotSet = false)
-    {
-        return;
-    }
-
     public override void OnSyncPositionFromServer(Vector3 pos)
     {
         transform.position = pos;
@@ -299,7 +294,8 @@ public class ThingEnemyAI: EnemyAI
     private IEnumerator DropItemsAndTeleportPlayer()
     {
         if(targetPlayer.playerClientId == GameNetworkManager.Instance.localPlayerController.playerClientId) playerToKillIsLocal = true;
-        if(playerToKillIsLocal) GameNetworkManager.Instance.localPlayerController.DropAllHeldItemsAndSync();
+        var playerTransform = GameNetworkManager.Instance.localPlayerController.transform;
+        if(playerToKillIsLocal) GameNetworkManager.Instance.localPlayerController.DropAllHeldItemsAndSync(playerTransform.position, playerTransform.position, playerTransform.rotation.eulerAngles, GameNetworkManager.Instance.localPlayerController.cameraContainerTransform.position, GameNetworkManager.Instance.localPlayerController.cameraContainerTransform.eulerAngles );
         
         yield return new WaitForSeconds(0.3f);
         
